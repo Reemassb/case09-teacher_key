@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Teacher Key - Case #09 The Stopped Clock</title>
+<style>
+:root{--ink:#0d1117;--ink2:#131a24;--ink3:#1a2430;--amb:#e8a33d;--chalk:#e9e7e2;
+      --chalk-dim:#9aa3ad;--ok:#5fb87a;--no:#d1604f;--rule:#26313d}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ink);color:var(--chalk);
+  font:15px/1.6 "Helvetica Neue",Arial,sans-serif;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:32px 22px 90px}
+h1{font-size:24px;margin:0}
+.caseno{font:600 12px/1 "Helvetica Neue",Arial,sans-serif;letter-spacing:.22em;color:#a8762c;margin-bottom:8px}
+.lede{color:var(--chalk-dim);max-width:70ch;margin:14px 0 26px}
+textarea{width:100%;min-height:130px;background:var(--ink2);border:1px solid var(--rule);
+  color:var(--chalk);border-radius:2px;padding:13px;font:15px/1.7 inherit;resize:vertical}
+select{background:var(--ink2);border:1px solid var(--rule);color:var(--chalk);border-radius:2px;
+  padding:11px 12px;font:15px inherit;margin-top:10px;width:100%;max-width:520px}
+textarea:focus,select:focus{border-color:var(--amb);outline:none}
+.btn{background:var(--amb);color:#17120a;border:0;border-radius:2px;padding:12px 24px;
+  font-size:15px;font-weight:700;cursor:pointer;margin-top:12px}
+.btn.ghost{background:transparent;color:var(--chalk-dim);border:1px solid var(--rule)}
+.warn{border-left:3px solid var(--amb);background:rgba(232,163,61,.07);padding:11px 14px;
+  margin:18px 0;color:var(--chalk-dim);font-size:13.5px}
+.team{background:var(--ink2);border:1px solid var(--rule);border-radius:3px;margin:20px 0;
+  overflow:hidden;break-inside:avoid;page-break-inside:avoid}
+.thead{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;
+  padding:14px 18px;border-bottom:1px solid var(--rule);background:var(--ink3)}
+.tname{font-weight:700;font-size:17px;letter-spacing:.06em}
+.verdict{font-weight:700;font-size:12.5px;letter-spacing:.08em;padding:5px 12px;border-radius:2px}
+.verdict.out{background:rgba(209,96,79,.16);color:var(--no);border:1px solid rgba(209,96,79,.4)}
+.verdict.ok{background:rgba(95,184,122,.16);color:var(--ok);border:1px solid rgba(95,184,122,.4)}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:0}
+.col{padding:16px 18px;border-right:1px solid var(--rule)}
+.col:last-child{border-right:0}
+h4{margin:0 0 10px;font-size:11.5px;letter-spacing:.14em;color:var(--amb);font-weight:700}
+.row{display:flex;justify-content:space-between;gap:12px;padding:4px 0;border-bottom:1px dotted #202b36}
+.row:last-child{border-bottom:0}
+.row span:first-child{color:var(--chalk-dim)}
+.row span:last-child{font-variant-numeric:tabular-nums;font-weight:600;text-align:right}
+.note{padding:12px 18px;border-top:1px solid var(--rule);color:var(--chalk-dim);font-size:13.5px;line-height:1.6}
+.err{color:var(--no)}
+@media print{
+  body{background:#fff;color:#000}.noprint{display:none}
+  .team,.col,.thead{background:#fff;border-color:#bbb}
+  h4{color:#7a5410}.row span:first-child{color:#555}
+  .verdict.out{color:#a32b18;border-color:#a32b18;background:#fff}
+  .verdict.ok{color:#1d6b36;border-color:#1d6b36;background:#fff}
+  .note,.warn{color:#444;background:#fff}
+}
+</style></head><body><div class="wrap">
+  <div class="caseno">EVIDENCE &amp; EQUATIONS &nbsp;&#183;&nbsp; CASE #09</div>
+  <h1>The Stopped Clock &#8212; Teacher Answer Key</h1>
+  <p class="lede">Paste your team names, one per line, exactly as students typed them. Spacing, case and
+  punctuation are ignored. The verdict turns on the <em>corrected</em> time of impact against the access
+  interval &#8212; never the dial reading, which sits inside that interval for about half of all teams
+  whichever way the verdict falls.</p>
+  <div class="noprint">
+    <textarea id="names" placeholder="KESTREL&#10;BRAMBLE&#10;TALLOW&#10;QUARRY"></textarea>
+    <select id="mode">
+      <option value="standard">Standard paper &#8212; small-angle model (Physics 1, AP Physics 1, IB SL)</option>
+      <option value="extended">Extended paper &#8212; includes circular error (HL / AP-C)</option>
+    </select>
+    <div class="warn"><strong>Set this to the paper you issued.</strong> The two papers generate different
+    evidence from the same team name, so a key made on the wrong setting produces plausible numbers that
+    match nothing. Check the case file reference: it ends <strong>-S</strong> on the standard paper and
+    <strong>-E</strong> on the extended one, and the same code appears on the student&#8217;s screen and
+    at the top of their exported report. If the letters differ, the paper is wrong, not the student.</div>
+    <div><button class="btn" id="go">Generate key</button>
+    <button class="btn ghost" id="pr">Print / save as PDF</button></div>
+  </div>
+  <div id="out"></div>
+</div>
+
+<script>
+/* CASE9-CORE-BEGIN */
+/* Evidence & Equations — Case 9: "The Stopped Clock"
+ * Reference physics core. Shared verbatim by the investigation app, the teacher
+ * answer-key generator and the verifier. Do not fork this file.
+ *
+ * Model
+ * -----
+ *   Small-angle period          T0    = 2*pi*sqrt(L_act/g)
+ *   Finite-amplitude period     Tamp  = T0 * (1 + theta0^2/16)      (circular error)
+ *   Required regulating length  L_req = g*(T_design/(2*pi))^2
+ *   Rate ratio                  r     = Tamp / T_design
+ *   The escapement advances the dial by T_design per completed oscillation, so
+ *   after n oscillations the dial shows n*T_design while n*Tamp of real time has
+ *   passed:     dt_true = r * dt_displayed.
+ *
+ * Syllabus modes
+ * --------------
+ *   'extended' — arc swings 3.8-6.0 deg, so circular error is 5-12% of the total
+ *                drift. The small-angle-only route then falls outside tolerance
+ *                at stages 4, 6 and 7 (but never flips the verdict).
+ *   'standard' — arc swings 0.6-0.95 deg, so circular error is under 1% of the
+ *                drift and the plain small-angle route is correct within
+ *                tolerance everywhere. For AP Physics 1 / IB SL.
+ *   Both modes run identical formulas; only the amplitude band differs.
+ *
+ * Leakage discipline
+ * ------------------
+ *   1. The verdict bit and the dial-inside bit come from a stream that never
+ *      sees the physics.
+ *   2. placeWindow NEVER rejects. Every (verdict, dialInside) combination is
+ *      geometrically realisable for every candidate, so conditioning on
+ *      generator success cannot couple the physics to the verdict.
+ *   3. The window is built in the frame where the drift is positive and then
+ *      reflected about its own centre when the drift is negative. Because the
+ *      drift sign is drawn 50/50 and its acceptance band is sign-symmetric by
+ *      construction (a rate offset is drawn directly, not a length error), the
+ *      dial's offset from the window edge has mean W/2 in EVERY branch. That is
+ *      what keeps "dial minus access-in" from carrying the verdict.
+ */
+(function (root, factory) {
+  var api = factory();
+  if (typeof module === 'object' && module.exports) module.exports = api;
+  else root.EE09 = api;
+})(typeof self !== 'undefined' ? self : this, function () {
+  'use strict';
+
+  var TAU = Math.PI * 2;
+  var DEG = Math.PI / 180;
+  var EPOCH = Date.UTC(2026, 2, 1, 0, 0, 0); // 00:00 UTC, Sunday 1 March 2026
+
+  var K = {
+    T_DESIGN: [1.000, 1.250, 1.500, 1.750, 2.000],
+    G_MIN: 9.7760, G_MAX: 9.8260,
+    MBOB_MIN: 1.20, MBOB_MAX: 6.50,     // bob mass: published, used by the energy
+                                        // stage, and absent from every timing formula
+    RHO_MIN: 0.0026, RHO_MAX: 0.0055,    // |rate - 1|, drawn directly so that the
+                                         // acceptance bands are sign-symmetric.
+                                         // Caps the clock at ~8 min/day: heavy for a
+                                         // serviced clock, defensible for a rehung one.
+    DAYS_MIN: 9, DAYS_MAX: 18,
+    SERVICE_TOD_MIN: 8 * 3600, SERVICE_TOD_MAX: 17 * 3600,
+    FACE_TOD_MIN: 18.5 * 3600, FACE_TOD_MAX: 22.5 * 3600,
+    D_MIN: 2400, D_MAX: 8400,            // total drift magnitude, seconds
+    ACORR_MAX: 1080,
+    MARGIN_MIN: 720,                     // verdict point >= 12 min from a window edge
+    MARGIN_ACORR_MULT: 1.8,              // ... and >= 1.8x the circular-error term, so
+                                         // dropping that term can never flip a verdict
+    FACE_MARGIN: 300,
+    ROUND_BUF: 90,                       // absorbs rounding the log to whole minutes
+    W_MIN: 12600, W_MAX: 25200,          // access window length (3.5-7 h night shift),
+                                         // drawn INDEPENDENTLY of the drift and always
+                                         // wide enough to hold both points with margins
+    W_OUT_MIN: 600, W_OUT_MAX: 7200,     // how far outside, when outside
+    ENV_SPAN_MIN: 240, ENV_SPAN_MAX: 420, // CCTV clip length, seconds
+    ENV_DP: 2,                           // timecode resolution, 0.01 s
+    DECAY_SPAN_MIN: 90, DECAY_SPAN_MAX: 140,  // free-decay test clips, seconds
+    DECAY_HI_MIN: 1.30, DECAY_HI_MAX: 1.50,  // arcs logged during the service test,
+    DECAY_LO_MIN: 0.45, DECAY_LO_MAX: 0.60,  // as multiples of the running arc
+    DECAY_GAP_MIN: 20,                       // minutes between the two clips
+    TOL_REL: 0.03,                       // house tolerance
+    TOL_PREC: 0.0010,                    // lengths and periods: the forensic signal
+                                         // IS a sub-1% difference, so a 3% band here
+                                         // would accept the design period itself
+    TOL_ANG: 0.0015,                     // amplitude angle: tight enough that
+                                         // substituting L_req for L_act is caught
+    LERR_MIN: 0.0050,                    // ... which requires the length error to
+                                         // stay above 3x that band
+    TOL_DTDISP: 60,                      // stage 5 is exact arithmetic: +/- 1 min
+    TOL_TIME: 150                        // stage 7 corrected datetime: +/- 2.5 min
+  };
+
+  var MODES = {
+    extended: {
+      name: 'extended', arcTerm: true,
+      THETA_MIN_DEG: 3.8, THETA_MAX_DEG: 6.0,
+      ACORR_MIN: 180, ACORR_FRAC_MIN: 0.05, ACORR_FRAC_MAX: 0.12,
+      ENV_REF: 'Tamp', ENV_MAX_DEV: 5e-5
+    },
+    standard: {
+      name: 'standard', arcTerm: false,
+      THETA_MIN_DEG: 0.60, THETA_MAX_DEG: 0.95,
+      ACORR_MIN: 0, ACORR_FRAC_MIN: 0, ACORR_FRAC_MAX: 0.010,
+      ENV_REF: 'T0', ENV_MAX_DEV: 8e-5
+    }
+  };
+
+  /* ---------------------------------------------------------------- RNG --- */
+
+  function xmur3(str) {
+    var h = 1779033703 ^ str.length;
+    for (var i = 0; i < str.length; i++) {
+      h = Math.imul(h ^ str.charCodeAt(i), 3432918353);
+      h = (h << 13) | (h >>> 19);
+    }
+    return function () {
+      h = Math.imul(h ^ (h >>> 16), 2246822507);
+      h = Math.imul(h ^ (h >>> 13), 3266489909);
+      h ^= h >>> 16;
+      return h >>> 0;
+    };
+  }
+
+  function sfc32(a, b, c, d) {
+    return function () {
+      a >>>= 0; b >>>= 0; c >>>= 0; d >>>= 0;
+      var t = (a + b) | 0;
+      a = b ^ (b >>> 9);
+      b = (c + (c << 3)) | 0;
+      c = (c << 21) | (c >>> 11);
+      d = (d + 1) | 0;
+      t = (t + d) | 0;
+      c = (c + t) | 0;
+      return (t >>> 0) / 4294967296;
+    };
+  }
+
+  var SEED_NS = 'E&E::CASE09::STOPPEDCLOCK::';
+  function rng(label) { var h = xmur3(SEED_NS + label); return sfc32(h(), h(), h(), h()); }
+  function normalizeTeam(name) {
+    return String(name == null ? '' : name).toUpperCase().replace(/[^A-Z0-9]/g, '');
+  }
+  function uni(r, lo, hi) { return lo + r() * (hi - lo); }
+  function pick(r, arr) { return arr[Math.floor(r() * arr.length)]; }
+  function rnd(x, dp) { var f = Math.pow(10, dp); return Math.round(x * f) / f; }
+
+  /* -------------------------------------------------------- date helpers --- */
+
+  var DAYNAME = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  var MONNAME = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+                 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  function d2(n) { return (n < 10 ? '0' : '') + n; }
+  function dateOf(ts) { return new Date(EPOCH + Math.round(ts) * 1000); }
+  function fmtClock(ts) {
+    var d = dateOf(ts);
+    return d2(d.getUTCHours()) + ':' + d2(d.getUTCMinutes()) + ':' + d2(d.getUTCSeconds());
+  }
+  function fmtHM(ts) {
+    var d = dateOf(ts);
+    return d2(d.getUTCHours()) + ':' + d2(d.getUTCMinutes());
+  }
+  function fmtDate(ts) {
+    var d = dateOf(ts);
+    return DAYNAME[d.getUTCDay()] + ' ' + d.getUTCDate() + ' ' + MONNAME[d.getUTCMonth()];
+  }
+  function fmtFull(ts) { return fmtDate(ts) + ', ' + fmtClock(ts); }
+  function fmtFullHM(ts) { return fmtDate(ts) + ', ' + fmtHM(ts); }
+  function fmtDur(s) {
+    var neg = s < 0; s = Math.abs(Math.round(s));
+    var d = Math.floor(s / 86400), h = Math.floor(s % 86400 / 3600),
+        m = Math.floor(s % 3600 / 60), sec = s % 60;
+    var parts = [];
+    if (d) parts.push(d + ' d');
+    if (d || h) parts.push(h + ' h');
+    if (d || h || m) parts.push(m + ' min');
+    parts.push(sec + ' s');
+    return (neg ? '-' : '') + parts.join(' ');
+  }
+
+  /* --------------------------------------------------- candidate physics --- */
+
+  function buildCandidate(r, M) {
+    var T_design = pick(r, K.T_DESIGN);
+    var g = rnd(uni(r, K.G_MIN, K.G_MAX), 4);
+    var L_req = g * Math.pow(T_design / TAU, 2);
+
+    /* Draw the RATE offset, then solve backwards for the length that produces it.
+       Drawing the length error instead would make the acceptance band asymmetric
+       in the drift sign (circular error always lengthens the period), and that
+       asymmetry leaks straight into the window geometry. */
+    var sgn = r() < 0.5 ? -1 : 1;
+    var rho = uni(r, K.RHO_MIN, K.RHO_MAX);
+    var thetaTarget = uni(r, M.THETA_MIN_DEG, M.THETA_MAX_DEG) * DEG;
+    var T0_target = (1 + sgn * rho) * T_design / (1 + thetaTarget * thetaTarget / 16);
+    var L_act = rnd(g * Math.pow(T0_target / TAU, 2), 4);   // published to 0.1 mm
+    if (L_act <= 0.05) return null;
+
+    // Scratch arc is the published quantity; theta0 is derived back out of it.
+    var arc = rnd(2 * L_act * thetaTarget, 4);              // full end-to-end arc, m
+    if (arc <= 0) return null;
+    var theta0 = (arc / 2) / L_act;                         // rad
+    var thetaDeg = theta0 / DEG;
+    if (thetaDeg < M.THETA_MIN_DEG || thetaDeg > M.THETA_MAX_DEG) return null;
+
+    var m_bob = rnd(uni(r, K.MBOB_MIN, K.MBOB_MAX), 2);
+    var E_swing = m_bob * g * L_act * (1 - Math.cos(theta0));
+
+    if (Math.abs(L_act / L_req - 1) < K.LERR_MIN) return null;
+
+    var T0 = TAU * Math.sqrt(L_act / g);
+    var ampFactor = 1 + theta0 * theta0 / 16;
+    var Tamp = T0 * ampFactor;
+    var rate = Tamp / T_design;
+
+    var serviceDay = 1 + Math.floor(r() * 3);                       // 1-3 March
+    var serviceTod = Math.round(uni(r, K.SERVICE_TOD_MIN, K.SERVICE_TOD_MAX) / 60) * 60;
+    var t_service = (serviceDay - 1) * 86400 + serviceTod;
+
+    var days = K.DAYS_MIN + Math.floor(r() * (K.DAYS_MAX - K.DAYS_MIN + 1));
+    var faceTod = Math.round(uni(r, K.FACE_TOD_MIN, K.FACE_TOD_MAX));
+    var t_faceDisp = (serviceDay - 1 + days) * 86400 + faceTod;
+
+    var dtDisp = t_faceDisp - t_service;
+    var dtTrue = rate * dtDisp;
+    var D = dtTrue - dtDisp;
+    var D_small = (T0 / T_design - 1) * dtDisp;
+    var A_corr = dtDisp * (T0 / T_design) * (theta0 * theta0 / 16);
+
+    if (Math.abs(D) < K.D_MIN || Math.abs(D) > K.D_MAX) return null;
+    if (A_corr < M.ACORR_MIN || A_corr > K.ACORR_MAX) return null;
+    var frac = A_corr / Math.abs(D);
+    if (frac < M.ACORR_FRAC_MIN || frac > M.ACORR_FRAC_MAX) return null;
+    if (D === 0 || D_small === 0) return null;
+    if ((D > 0) !== (D_small > 0)) return null;     // circular error must not
+                                                    // control the sign of the drift
+
+    /* Sealed envelope: an oscillation count over a CCTV clip, timecoded to 0.01 s.
+       Long enough that the measured period resolves the circular-error term
+       itself (about 1 part in 50,000 against a term of 3-8 parts in 10,000). */
+    var N_osc = Math.round(uni(r, K.ENV_SPAN_MIN, K.ENV_SPAN_MAX) / Tamp);
+    if (N_osc < 100) return null;
+    var envDur = rnd(N_osc * Tamp, K.ENV_DP);
+    var T_meas = envDur / N_osc;
+    var envRef = M.ENV_REF === 'Tamp' ? Tamp : T0;
+    if (Math.abs(T_meas - envRef) / envRef > M.ENV_MAX_DEV) return null;
+
+    /* Free-decay test logged at the service, escapement disengaged: two arcs
+       twenty minutes apart, each timed over a short clip. Periods come from the
+       SAME law as everything else, so the log is truthful in both modes -- in
+       extended the two periods differ measurably, in standard they agree to the
+       timing resolution. Neither arc is the running arc: using one by mistake
+       must fail stage 3, and cannot flip a verdict (see MARGIN_ACORR_MULT). */
+    function decayClip(mult) {
+      var a = rnd(arc * mult, 4);
+      var th = (a / 2) / L_act;
+      var T = TAU * Math.sqrt(L_act / g) * (1 + th * th / 16);
+      var n = Math.round(uni(r, K.DECAY_SPAN_MIN, K.DECAY_SPAN_MAX) / T);
+      if (n < 25) return null;
+      return { arc: a, theta: th, T: T, n: n, dur: rnd(n * T, K.ENV_DP) };
+    }
+    var dHi = decayClip(uni(r, K.DECAY_HI_MIN, K.DECAY_HI_MAX));
+    var dLo = decayClip(uni(r, K.DECAY_LO_MIN, K.DECAY_LO_MAX));
+    if (!dHi || !dLo) return null;
+    if (dHi.arc <= arc || dLo.arc >= arc) return null;
+    /* The mode's promise about the decay log must hold as a generated fact, not
+       only as a claim in the teacher guide. */
+    var dGap = Math.abs(dHi.dur / dHi.n - dLo.dur / dLo.n) / T0;
+    var dRes = 0.5 * Math.pow(10, -K.ENV_DP) / Math.min(dHi.dur, dLo.dur);
+    if (M.arcTerm ? (dGap < 5 * dRes) : (dGap > 2 * dRes)) return null;
+
+    return {
+      mode: M.name,
+      T_design: T_design, g: g, L_req: L_req, L_act: L_act, rho: sgn * rho,
+      arc: arc, theta0: theta0, m_bob: m_bob, E_swing: E_swing,
+      T0: T0, Tamp: Tamp, rate: rate,
+      omega: TAU / T0, A_lin: L_act * theta0, vmax: (TAU / T0) * (L_act * theta0),
+      t_service: t_service, days: days, t_faceDisp: t_faceDisp,
+      dtDisp: dtDisp, dtTrue: dtTrue, t_true: t_service + dtTrue,
+      D: D, D_small: D_small, A_corr: A_corr,
+      driftPerDay: 86400 * (rate - 1),
+      N_osc: N_osc, envDur: envDur, T_meas: T_meas,
+      dHi: dHi, dLo: dLo
+    };
+  }
+
+  /* ------------------------------------------------- access-window layout --- */
+  /* Never returns null. See the leakage discipline note at the top of the file.
+     alpha is the dial reading's offset from the start of the access window,
+     built in the frame where the drift is positive and mirrored when it is not. */
+
+  function placeWindow(c, verdictInside, faceInside, r) {
+    var Mv = Math.max(K.MARGIN_MIN, K.MARGIN_ACORR_MULT * c.A_corr) + K.ROUND_BUF;
+    var Mu = K.FACE_MARGIN + K.ROUND_BUF;
+    var W = Math.round(uni(r, K.W_MIN, K.W_MAX) / 60) * 60;
+    var Dm = Math.abs(c.D);
+    var alpha;
+
+    if (verdictInside && faceInside) {
+      alpha = uni(r, Math.max(Mu, Mv - Dm), W - Mv - Dm);
+    } else if (verdictInside && !faceInside) {
+      alpha = uni(r, Mv - Dm, -Mu);                       // dial before the window
+    } else if (!verdictInside && faceInside) {
+      alpha = uni(r, W - Dm + Mv, W - Mu);                // true time past the far edge
+    } else if (r() < 0.5) {
+      alpha = -(Mv + Dm) - uni(r, K.W_OUT_MIN, K.W_OUT_MAX);   // both before
+    } else {
+      alpha = W + Mu + uni(r, K.W_OUT_MIN, K.W_OUT_MAX);       // both after
+    }
+    if (c.D < 0) alpha = W - alpha;                       // reflect about window centre
+
+    var t_in = Math.round((c.t_faceDisp - alpha) / 60) * 60;
+    var t_out = t_in + W;
+
+    var v = c.t_true, u = c.t_faceDisp;
+    var vIn = (v > t_in) && (v < t_out);
+    var uIn = (u > t_in) && (u < t_out);
+    var margin = Math.min(Math.abs(v - t_in), Math.abs(v - t_out));
+    var faceGap = Math.min(Math.abs(u - t_in), Math.abs(u - t_out));
+
+    /* These are invariants of the construction, not filters. A throw here means
+       the geometry proof above is wrong; the verifier turns it into a failure. */
+    if (vIn !== verdictInside) throw new Error('window invariant: verdict side');
+    if (uIn !== faceInside) throw new Error('window invariant: dial side');
+    if (margin < K.MARGIN_MIN) throw new Error('window invariant: verdict margin');
+    if (faceGap < K.FACE_MARGIN) throw new Error('window invariant: dial margin');
+
+    return { t_in: t_in, t_out: t_out, W: W, margin: margin, faceGap: faceGap,
+             M: Mv, alpha: u - t_in, faceInside: faceInside };
+  }
+
+  /* --------------------------------------------------------- assembly ----- */
+
+  function assemble(team, display, c, w, verdictInside, faceInside, attempts) {
+    var envRefVal = c.mode === 'extended' ? c.Tamp : c.T0;
+    var envPct = 100 * (c.T_meas - envRefVal) / envRefVal;
+
+    var given = {
+      team: team, teamDisplay: display,
+      mode: c.mode,
+      /* The paper is baked into the case file reference. The two papers issue
+         different evidence for the same team, and a key built on the wrong one
+         produces plausible-looking numbers that match nothing -- so the mismatch
+         has to be visible at a glance, not inferred from a warning. */
+      caseFile: 'MC-' + (1000 + (xmur3(team + '#file')() % 9000))
+                + (c.mode === 'extended' ? '-E' : '-S'),
+      T_design: c.T_design,
+      g: c.g,
+      L_act: c.L_act,
+      arc: c.arc,
+      m_bob: c.m_bob,
+      serviceStamp: c.t_service,
+      serviceText: fmtFull(c.t_service),
+      faceStamp: c.t_faceDisp,
+      faceDateText: dateOf(c.t_faceDisp).getUTCDate() + ' March (calendar aperture)',
+      faceClockText: fmtClock(c.t_faceDisp),
+      accessIn: w.t_in,
+      accessOut: w.t_out,
+      accessInText: fmtFullHM(w.t_in),
+      accessOutText: fmtFullHM(w.t_out),
+      decayGapMin: K.DECAY_GAP_MIN,
+      decayHiArc: c.dHi.arc, decayHiN: c.dHi.n, decayHiDur: c.dHi.dur,
+      decayLoArc: c.dLo.arc, decayLoN: c.dLo.n, decayLoDur: c.dLo.dur
+    };
+    var sealed = { envN: c.N_osc, envDur: c.envDur };
+
+    var answers = {
+      s1_L_req: c.L_req,
+      s2_T0: c.T0,
+      s2_omega: c.omega,
+      s3_theta0_rad: c.theta0,
+      s3_theta0_deg: c.theta0 / DEG,
+      s3_A_lin: c.A_lin,
+      s3_vmax: c.vmax,
+      s3_E: c.E_swing,
+      s4_Tamp: c.Tamp,
+      s4_ampDrift: 86400 * (c.Tamp - c.T0) / c.T_design,
+      s4_rate: c.rate,
+      s4_driftPerDay: c.driftPerDay,
+      env_Tmeas: c.T_meas,
+      env_pctDiff: envPct,
+      d_T_hi: c.dHi.dur / c.dHi.n,
+      d_T_lo: c.dLo.dur / c.dLo.n,
+      d_theta_hi_deg: c.dHi.theta / DEG,
+      d_theta_lo_deg: c.dLo.theta / DEG,
+      d_energyRatio: Math.pow(c.dLo.theta / c.dHi.theta, 2),
+      d_vRatio: c.dLo.theta / c.dHi.theta,
+      s5_dtDisp: c.dtDisp,
+      s6_dtTrue: c.dtTrue,
+      s6_D: c.D,
+      s7_tTrue: c.t_true,
+      s7_tTrueText: fmtFull(c.t_true)
+    };
+
+    /* Values the teacher key prints and the app names when it sees them. Each
+       is a specific misconception, not a generic miss. */
+    var th = c.theta0, dd = c.dtDisp;
+    var truth = {
+      runsSlow: c.D > 0,
+      hungShort: c.L_act < c.L_req,
+      lengthErrPct: 100 * (c.L_act / c.L_req - 1),
+      driftPerDay: c.driftPerDay,
+      totalDrift: c.D,
+      arcTermShare: 100 * c.A_corr / Math.abs(c.D),
+      decayEnergyLossPct: 100 * (1 - Math.pow(c.dLo.theta / c.dHi.theta, 2)),
+      decayVLossPct: 100 * (1 - c.dLo.theta / c.dHi.theta),
+      gLondon: 9.8166,
+      gLondonSecPerDay: 86400 * (Math.sqrt(9.8166 / c.g) - 1),
+      wrong: {
+        fullArcAngle: (c.arc / c.L_act) / DEG,          // forgot the arc is end to end
+        dialAsTruth: c.t_faceDisp,                      // dial read as the real time
+        inverseRate: c.t_service + dd / c.rate,         // correction applied backwards
+        linearLength: c.t_service + dd * (c.L_act / c.L_req), // scaled by length, not its root
+        noCorrection: c.t_service + dd,                 // no correction at all
+        smallAngleOnly: c.t_service + (c.T0 / c.T_design) * dd
+      }
+    };
+
+    return {
+      team: team, teamDisplay: display, attempts: attempts, mode: c.mode,
+      given: given, sealed: sealed, answers: answers, truth: truth,
+      internals: c, window: w,
+      verdictInside: verdictInside,
+      faceInside: faceInside,
+      verdict: verdictInside ? 'IMPACT INSIDE ACCESS WINDOW' : 'IMPACT OUTSIDE ACCESS WINDOW',
+      verdictLabel: verdictInside
+        ? 'IMPACT INSIDE ACCESS WINDOW'
+        : 'IMPACT OUTSIDE ACCESS WINDOW',
+      verdictText: verdictInside
+        ? 'The corrected time of impact, ' + fmtFull(c.t_true) + ', falls inside the '
+          + 'interval in which the access log records Vance within the building ('
+          + fmtHM(w.t_in) + ' to ' + fmtHM(w.t_out) + '). The clock evidence does not '
+          + 'exclude him from the workshop at the moment the clock was struck. It does not, '
+          + 'on its own, establish that he caused it.'
+        : 'The corrected time of impact, ' + fmtFull(c.t_true) + ', falls outside the '
+          + 'interval in which the access log records Vance within the building ('
+          + fmtHM(w.t_in) + ' to ' + fmtHM(w.t_out) + '). On the clock evidence alone he '
+          + 'was not in the workshop when the clock was struck. This says nothing about '
+          + 'access at any other time.'
+    };
+  }
+
+  function generate(teamName, modeName) {
+    var team = normalizeTeam(teamName);
+    if (!team) throw new Error('team name required');
+    var M = MODES[modeName || 'extended'];
+    if (!M) throw new Error('unknown mode: ' + modeName);
+    var rv = rng(team + '#verdict');
+    var verdictInside = rv() < 0.5;
+    var faceInside = rv() < 0.5;
+    for (var a = 0; a < 600; a++) {
+      var c = buildCandidate(rng(team + '#' + M.name + '#phys#' + a), M);
+      if (!c) continue;
+      var w = placeWindow(c, verdictInside, faceInside,
+                          rng(team + '#' + M.name + '#win#' + a));
+      return assemble(team, String(teamName||'').trim(), c, w, verdictInside, faceInside, a + 1);
+    }
+    throw new Error('generator exhausted for team "' + team + '"');
+  }
+
+  /* -------------------------------------------------------- re-derivation -- */
+  /* Recomputes every answer from the PUBLISHED evidence fields only. The
+     verifier asserts this reproduces answers exactly; that is the parity guard
+     between app, key and reference. */
+
+  function solveFromEvidence(ev, sealed) {
+    var L_req = ev.g * Math.pow(ev.T_design / TAU, 2);
+    var theta0 = (ev.arc / 2) / ev.L_act;
+    var T0 = TAU * Math.sqrt(ev.L_act / ev.g);
+    var omega = TAU / T0;
+    var Tamp = T0 * (1 + theta0 * theta0 / 16);
+    var rate = Tamp / ev.T_design;
+    var A_lin = ev.L_act * theta0;
+    var dtDisp = ev.faceStamp - ev.serviceStamp;
+    var dtTrue = rate * dtDisp;
+    var tTrue = ev.serviceStamp + dtTrue;
+    var T_meas = sealed.envDur / sealed.envN;
+    var envRefVal = ev.mode === 'extended' ? Tamp : T0;
+    return {
+      s1_L_req: L_req,
+      s2_T0: T0, s2_omega: omega,
+      s3_theta0_rad: theta0, s3_theta0_deg: theta0 / DEG,
+      s3_A_lin: A_lin, s3_vmax: omega * A_lin,
+      s3_E: ev.m_bob * ev.g * ev.L_act * (1 - Math.cos(theta0)),
+      s4_Tamp: Tamp,
+      s4_ampDrift: 86400 * (Tamp - T0) / ev.T_design,
+      s4_rate: rate, s4_driftPerDay: 86400 * (rate - 1),
+      env_Tmeas: T_meas,
+      env_pctDiff: 100 * (T_meas - envRefVal) / envRefVal,
+      d_T_hi: ev.decayHiDur / ev.decayHiN,
+      d_T_lo: ev.decayLoDur / ev.decayLoN,
+      d_theta_hi_deg: ((ev.decayHiArc / 2) / ev.L_act) / DEG,
+      d_theta_lo_deg: ((ev.decayLoArc / 2) / ev.L_act) / DEG,
+      d_energyRatio: Math.pow(ev.decayLoArc / ev.decayHiArc, 2),
+      d_vRatio: ev.decayLoArc / ev.decayHiArc,
+      s5_dtDisp: dtDisp,
+      s6_dtTrue: dtTrue, s6_D: dtTrue - dtDisp,
+      s7_tTrue: tTrue, s7_tTrueText: fmtFull(tTrue),
+      verdictInside: (tTrue > ev.accessIn) && (tTrue < ev.accessOut)
+    };
+  }
+
+  /* ------------------------------------------------------------ grading --- */
+
+  var STAGE_TOL = {
+    s1_L_req: ['rel', K.TOL_PREC], s2_T0: ['rel', K.TOL_PREC],
+    s2_omega: ['rel', K.TOL_PREC], s3_theta0_rad: ['rel', K.TOL_ANG],
+    s3_theta0_deg: ['rel', K.TOL_ANG], s3_A_lin: ['rel', K.TOL_REL],
+    s3_vmax: ['rel', K.TOL_REL], s3_E: ['rel', K.TOL_REL], s4_ampDrift: ['rel', K.TOL_REL],
+    s4_rate: ['offset1', K.TOL_REL], s4_driftPerDay: ['rel', K.TOL_REL],
+    env_Tmeas: ['rel', K.TOL_PREC],
+    s5_dtDisp: ['abs', K.TOL_DTDISP], s6_dtTrue: ['abs', K.TOL_TIME],
+    s6_D: ['rel', K.TOL_REL], s7_tTrue: ['abs', K.TOL_TIME]
+  };
+
+  /* Stage 4's circular-error sub-step only exists in extended mode. */
+  var GRADED = {
+    extended: Object.keys(STAGE_TOL),
+    standard: Object.keys(STAGE_TOL).filter(function (k) { return k !== 's4_ampDrift'; })
+  };
+
+  function accepts(field, submitted, truth) {
+    var spec = STAGE_TOL[field];
+    if (!spec) throw new Error('no tolerance for ' + field);
+    if (!isFinite(submitted)) return false;
+    if (spec[0] === 'abs') return Math.abs(submitted - truth) <= spec[1];
+    if (spec[0] === 'offset1') {
+      // The rate ratio sits within ~1% of 1, so a 3% band on the value itself
+      // would accept every wrong method. Grade the departure from unity.
+      return Math.abs((submitted - 1) - (truth - 1)) <= spec[1] * Math.abs(truth - 1);
+    }
+    if (truth === 0) return Math.abs(submitted) <= 1e-9;
+    return Math.abs(submitted - truth) / Math.abs(truth) <= spec[1];
+  }
+
+  return {
+    K: K, MODES: MODES, TAU: TAU, DEG: DEG, EPOCH: EPOCH,
+    generate: generate, solveFromEvidence: solveFromEvidence,
+    normalizeTeam: normalizeTeam, accepts: accepts,
+    STAGE_TOL: STAGE_TOL, GRADED: GRADED,
+    fmtClock: fmtClock, fmtHM: fmtHM, fmtDate: fmtDate, fmtFull: fmtFull,
+    fmtFullHM: fmtFullHM, fmtDur: fmtDur, dateOf: dateOf
+  };
+});
+/* CASE9-CORE-END */
+</script>
+
+<script>
+(function(){
+var $=function(s){return document.querySelector(s);};
+var C=window.EE09;
+function f(v,d){return Number(v).toFixed(d);}
+function row(k,v){return '<div class="row"><span>'+k+'</span><span>'+v+'</span></div>';}
+
+function card(R,mode){
+  var EXT=mode==='extended', g=R.given, s=R.sealed, a=R.answers, t=R.truth;
+  var inside=R.verdict==='IMPACT INSIDE ACCESS WINDOW';
+
+  var ev = row('Design period',f(g.T_design,3)+' s')
+    + row('Site g',f(g.g,4)+' m/s\u00b2')
+    + row('Pendulum as found',f(g.L_act,4)+' m')
+    + row('Required length',f(a.s1_L_req,4)+' m')
+    + row('Bob mass',f(g.m_bob,2)+' kg')
+    + row('Scratch arc',f(g.arc,4)+' m')
+    + row('Regulator set',g.serviceText)
+    + row('Dial stopped',g.faceDateText.replace(' (calendar aperture)','')+' '+g.faceClockText)
+    + row('Access log',C.fmtHM(g.accessIn)+' \u2013 '+C.fmtHM(g.accessOut))
+    + row('Sealed clip',s.envN+' osc / '+f(s.envDur,2)+' s')
+    + row('Decay arcs',f(g.decayHiArc,4)+' \u2192 '+f(g.decayLoArc,4)+' m')
+    + row('Post-incident inspection','suspension + rating nut undisturbed');
+
+  var st = row('1 &#183; L required',f(a.s1_L_req,4)+' m')
+    + row('2 &#183; T\u2080',f(a.s2_T0,6)+' s')
+    + row('2 &#183; \u03c9',f(a.s2_omega,5)+' rad/s')
+    + row('3 &#183; \u03b8\u2080',f(a.s3_theta0_deg,3)+'\u00b0 / '+f(a.s3_theta0_rad,5)+' rad')
+    + row('3 &#183; A',f(a.s3_A_lin,5)+' m')
+    + row('3 &#183; v max',f(a.s3_vmax,5)+' m/s')
+    + row('3 &#183; E',f(a.s3_E,5)+' J')
+    + (EXT ? row('4 &#183; circular error',f(a.s4_ampDrift,3)+' s/day')
+           + row('4 &#183; T with arc',f(a.s4_Tamp,6)+' s') : '')
+    + row('4 &#183; rate ratio',f(a.s4_rate,8))
+    + row('4 &#183; drift/day',f(a.s4_driftPerDay,2)+' s')
+    + row('5 &#183; clip period',f(a.env_Tmeas,6)+' s ('+f(a.env_pctDiff,4)+'%)')
+    + row('6 &#183; displayed',C.fmtDur(a.s5_dtDisp))
+    + row('6 &#183; true elapsed',C.fmtDur(a.s6_dtTrue))
+    + row('6 &#183; total drift',f(a.s6_D,1)+' s')
+    + row('7 &#183; impact at',a.s7_tTrueText);
+
+  var tr = row('Pendulum hung',(t.hungShort?'short':'long')+' by '+f(Math.abs(t.lengthErrPct),3)+'%')
+    + row('Clock ran',(t.runsSlow?'slow':'fast'))
+    + row('Dial reads',(t.runsSlow?'earlier':'later')+' than truth')
+    + row('Drift over the period',C.fmtDur(Math.abs(t.totalDrift)))
+    + row('Dial inside the window?',((g.faceStamp>g.accessIn&&g.faceStamp<g.accessOut)?'yes':'no'))
+    + row('Margin to nearest edge',C.fmtDur(Math.min(Math.abs(a.s7_tTrue-g.accessIn),
+        Math.abs(a.s7_tTrue-g.accessOut))))
+    + (EXT?row('Arc term as % of drift',f(t.arcTermShare,1)+'%'):'')
+    + row('Decay: energy lost',f(t.decayEnergyLossPct,0)+'%')
+    + row('Decay: v max lost',f(t.decayVLossPct,0)+'%')
+    + row('Decay periods',f(a.d_T_hi,5)+' / '+f(a.d_T_lo,5)+' s');
+
+  var W=t.wrong;
+  var wrongList = row('Full arc as amplitude',f(W.fullArcAngle,3)+'\u00b0')
+    + row('Dial read as the truth',C.fmtClock(W.dialAsTruth))
+    + row('Correction reversed',C.fmtClock(W.inverseRate))
+    + row('Scaled by length, not \u221alength',C.fmtClock(W.linearLength))
+    + row('No correction at all',C.fmtClock(W.noCorrection))
+    + (EXT?row('Small-angle only',C.fmtClock(W.smallAngleOnly)):'');
+
+  return '<div class="team">'
+    +'<div class="thead"><div class="tname">'+g.team
+    +' <span style="font-weight:400;font-size:12.5px;color:var(--chalk-dim)">'+g.caseFile
+    +' &middot; '+(EXT?'EXTENDED':'STANDARD')+' paper</span></div>'
+    +'<div class="verdict '+(inside?'ok':'out')+'">'+R.verdictLabel+'</div></div>'
+    +'<div class="cols">'
+    +'<div class="col"><h4>EVIDENCE ISSUED</h4>'+ev+'</div>'
+    +'<div class="col"><h4>STAGE ANSWERS</h4>'+st+'</div>'
+    +'<div class="col"><h4>WHAT ACTUALLY HAPPENED</h4>'+tr+'</div>'
+    +'<div class="col"><h4>WRONG ANSWERS THE APP NAMES</h4>'+wrongList+'</div>'
+    +'</div>'
+    +'<div class="note">'
+    + 'The dial reads <strong>'+C.fmtClock(g.faceStamp)+'</strong>; the impact was actually at <strong>'
+    + C.fmtClock(a.s7_tTrue)+'</strong>, '+C.fmtDur(Math.abs(t.totalDrift))+' '
+    + (t.totalDrift>0?'later':'earlier')+'. '
+    + (inside
+       ? 'Correcting the dial leaves the impact inside the access interval. Watch for students concluding '
+        +'that this shows Vance forced the cabinet \u2014 the clock places an event in time, not a person at it.'
+       : 'Correcting the dial moves the impact outside the access interval, which the uncorrected dial does '
+        +'not show. Watch for students claiming this clears Vance of everything rather than of being in the '
+        +'room at that minute.')
+    + ' Gate answers: mass has <strong>no</strong> effect; the decay log shows the period '
+    + (EXT?'moving only by the second-order arc term':'unchanged')+' while energy fell '
+    + f(t.decayEnergyLossPct,0)+'%; the cross-check validates the <strong>model</strong>, not the verdict; '
+    + 'the pendulum was hung <strong>'+(t.hungShort?'short':'long')+'</strong> so the dial reads <strong>'
+    + (t.runsSlow?'earlier':'later')+'</strong> than the truth.'
+    +'</div></div>';
+}
+
+$('#go').addEventListener('click',function(){
+  var mode=$('#mode').value;
+  var names=$('#names').value.split(/\n/).map(function(s){return s.trim();})
+    .filter(function(s){return C.normalizeTeam(s).length>=3;});
+  if(!names.length){ $('#out').innerHTML='<p class="err">Enter at least one team name of three or more '
+    +'letters or digits.</p>'; return; }
+  var seen={},uniq=[];
+  names.forEach(function(x){var k=C.normalizeTeam(x); if(!seen[k]){seen[k]=1;uniq.push(x);}});
+  var out='', nIn=0;
+  uniq.forEach(function(x){
+    try{ var R=C.generate(x,mode);
+      if(R.verdict==='IMPACT INSIDE ACCESS WINDOW') nIn++;
+      out+=card(R,mode);
+    }catch(e){ out+='<div class="team"><div class="thead"><div class="tname">'+x
+      +'</div></div><div class="note err">Could not generate: '+e.message+'</div></div>'; }
+  });
+  $('#out').innerHTML='<p class="lede" style="margin-top:26px">'+uniq.length+' teams &#183; '+nIn
+    +' impact inside the window &#183; '+(uniq.length-nIn)+' outside &#183; '+mode+' paper</p>'+out;
+});
+$('#pr').addEventListener('click',function(){window.print();});
+})();
+</script></body></html>
